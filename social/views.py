@@ -9,9 +9,8 @@ from .facebook import GraphAPI, get_access_token_from_code
 # Create your views here.
 
 
-# displaying about us page content with html files.
-def  display_about_us(request):
-    return render(request, "aboutus.html")
+def  index(request):
+    return HttpResponse("<h1>your project runs successfully</h1>")
 
 
 def user_login(request):
@@ -50,25 +49,28 @@ def google_login(request):
         print ('info')
         print (info)
         url = 'https://www.googleapis.com/oauth2/v1/userinfo'
-        params = {'access_token': info['access_token']}
-        kw = dict(params=params, headers={}, timeout=60)
-        response = requests.request('GET', url, **kw)
-        user_document = response.json()
-        print ('response')
-        print (user_document)
+        if 'access_token' in info.keys():
+            params = {'access_token': info['access_token']}
+            kw = dict(params=params, headers={}, timeout=60)
+            response = requests.request('GET', url, **kw)
+            user_document = response.json()
+            print ('response')
+            print (user_document)
 
-        email_matches = User.objects.filter(email=user_document['email'])
-        link = "https://plus.google.com/" + user_document['id']
+            email_matches = User.objects.filter(email=user_document['email'])
+            link = "https://plus.google.com/" + user_document['id']
 
-        if email_matches:
-            user = email_matches[0]
+            if email_matches:
+                user = email_matches[0]
+            else:
+                print ("user create")
+                user = User.objects.create(email=user_document['email'], username=user_document['email'])
+            user = authenticate(username=user_document['email'])
+
+            login(request, user)
+            return render(request, 'home.html', {'user_document': user_document})
         else:
-            print ("user create")
-            user = User.objects.create(email=user_document['email'], username=user_document['email'])
-        user = authenticate(username=user_document['email'])
-
-        login(request, user)
-        return HttpResponseRedirect('/home/')
+            return HttpResponseRedirect('/login/')
     else:
         rty = "https://accounts.google.com/o/oauth2/auth?client_id=" + \
                settings.GOOGLE_APP_ID + "&response_type=code"
@@ -89,7 +91,7 @@ def facebook_login(request):
             return render(request, '404.html', {'message_type': message_type, 'message': message, 'reason': reason})
         graph = GraphAPI(accesstoken['access_token'])
         accesstoken = graph.extend_access_token(settings.FB_APP_ID, settings.FB_SECRET)['accesstoken']
-        profile = graph.get_object("me", fields="id,name,email,birthday,hometown,location")
+        profile = graph.get_object("me", fields="id,name,email,birthday,hometown,location,link,locale,gender")
         print (profile)
         email = profile['email'] if 'email' in profile.keys() else ''
         hometown = profile['hometown']['name'] if 'hometown' in profile.keys() else ''
@@ -114,6 +116,8 @@ def facebook_login(request):
             return render(request, '404.html', {'message_type': message_type, 'message': message, 'reason': reason})
 
         login(request, user)
+        return render(request, 'home.html', {'profile': profile, 'email': email, 'hometown': hometown, 'location': location, 'profile_pic': profile_pic})
+
         return HttpResponseRedirect('/home/')
     elif 'error' in request.GET:
         # TODO : log the error and transfer to error page

@@ -134,15 +134,17 @@ TEMPLATES = [
         },
     },
 ]
+
 AUTH_USER_MODEL = 'auth.User'
 
-GOOGLE_APP_ID = "284074696476-lqg4v1v39og5vejbkj7vgvk6qvo7pomj.apps.googleusercontent.com"
-GOOGLE_SECRET_KEY = "NZc3iZ-bq9i49IyvBeHp7I4L"
-GOOGLE_REDIRECT_URL = 'http://test.sociallogins.com:8000/google-login/'
+GOOGLE_APP_ID = ""
+GOOGLE_SECRET_KEY = ""
+GOOGLE_REDIRECT_URL = ''
 
-FB_APP_ID = '298095757279560'
-FB_SECRET = '8130c8811e4e540c158f851fc36cba80'
-FACEBOOK_REDIRECT_URL = 'http://test.sociallogins.com:8000/facebook-login/'
+FB_APP_ID = ''
+FB_SECRET = ''
+FACEBOOK_REDIRECT_URL = ''
+
 
 AUTHENTICATION_BACKENDS = (
     # ... your other backends

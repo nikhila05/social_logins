@@ -15,11 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from social.views import display_about_us, user_login, home_display, google_login, facebook_login, log_out
+from social.views import user_login, home_display, google_login, facebook_login, log_out, index
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^aboutus/', display_about_us),
+    url(r'^$', index),
     url(r'^login/', user_login),
     url(r'^home/', home_display),
     url(r'^google-login/', google_login),
